@@ -1,0 +1,10 @@
+{
+    "_id" : 1,
+    "active" : false,
+    "tag" : "girl",
+    "count_max" : 10,
+    "like_min" : 10,
+    "comment_min" : 1,
+    "wait_time" : 0,
+    "update_time" : ISODate("2021-04-09T10:08:53.452Z")
+}

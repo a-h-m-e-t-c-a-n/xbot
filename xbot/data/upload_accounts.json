@@ -1,0 +1,17 @@
+{
+    "_id" : 1,
+    "active" : true,
+    "accept":[["cat1","cat2"]],
+    "reject":[["cat3","cat4"]],
+    "accountid" : "naringunduz000",
+    "password" : "social8019.",
+    "language" : "en",
+    "past_max" : 0,
+    "part_max" : 1,
+    "elevation_min" : 0,
+    "like_min" : 0,
+    "comment_min" : 1,
+    "order_elevation" : true,
+    "upload_interval" : 1,
+    "last_shared" : ""
+}

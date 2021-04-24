@@ -1,0 +1,24 @@
+FROM ubuntu:20.10
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN=true
+
+RUN apt update
+
+RUN apt install -y software-properties-common curl unzip
+
+RUN add-apt-repository -y ppa:deadsnakes/ppa
+RUN apt install curl python3.8 python3-pip -y 
+
+RUN  rm /usr/bin/python;ln -s /usr/bin/python3.8 /usr/bin/python 
+RUN  python -m pip install pymongo asyncio langdetect
+
+RUN  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install;rm -r aws
+
+#WORKDIR /xbot
+#ADD xbot /xbot
+
+ENTRYPOINT ["bash","/xbot/start.sh"]
+

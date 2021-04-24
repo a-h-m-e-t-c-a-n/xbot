@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  emi:
+    image: xbot
+    privileged: true
+    tty: true
+    restart: always
+    shm_size: 32gb
+    ports:
+      - 0.0.0.0:25901:5901 
+      - 0.0.0.0:26901:6901
+    volumes:
+      - ./volume/files:/files
+      - ./xbot:/xbot
+    environment: 
+      - MEDIA_PATH=/files/
+      - MONGO_CONN=mongodb://root:80190221@mongodb:27017/
+      - WORKERID=1 
+      - VNC_PW=emi
+
+networks:
+  default:
+      name: xbot_network
+    

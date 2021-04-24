@@ -1,0 +1,44 @@
+FROM accetto/ubuntu-vnc-xfce
+
+ADD scripts/vnc_startup.sh /dockerstartup
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN=true
+
+RUN apt update
+
+RUN apt install -y build-essential software-properties-common wget git curl
+
+RUN add-apt-repository -y ppa:deadsnakes/ppa
+RUN apt install wget openjdk-8-jdk python3.8 python3-pip ffmpeg -y 
+
+RUN  rm /usr/bin/python;ln -s /usr/bin/python3.8 /usr/bin/python 
+RUN  python -m pip install pymongo instaloader asyncio langdetect
+
+RUN update-java-alternatives --set java-1.8.0-openjdk-amd64
+
+# Install SDK Manager
+# you can find this file at https://developer.android.com/studio/index.html#downloads - section command line only
+RUN  wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
+
+ENV ANDROID_HOME=/opt/androidsdk
+RUN mkdir -p $ANDROID_HOME
+RUN apt install unzip -y && unzip sdk-tools-linux-4333796.zip -d $ANDROID_HOME
+
+RUN echo "export ANDROID_HOME=$ANDROID_HOME" >> ~/.bashrc
+RUN echo 'export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$SDK/tools/bin:$ANDROID_HOME/platform-tools:$PATH' >> ~/.bashrc
+
+ENV PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
+
+# source ~/.bashrc
+
+# Install Android Image version 30
+RUN yes | $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms;android-29" "emulator"
+RUN yes | $ANDROID_HOME/tools/bin/sdkmanager "system-images;android-29;default;x86_64"
+
+RUN rm -r $ANDROID_HOME/system-images/android-29/default/x86_64
+ADD customimg/x86_64 $ANDROID_HOME/system-images/android-29/default/x86_64
+
+RUN  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install;rm -r aws

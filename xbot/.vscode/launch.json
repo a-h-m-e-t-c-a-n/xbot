@@ -1,0 +1,41 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: ROOT",
+            "type": "python",
+            "request": "launch",
+            "program": "main.py",
+            "console": "integratedTerminal",
+            "sudo": true,
+        },
+        {
+            "name": "Python: Unit Test EMI",
+            "type": "python",
+            "request": "launch",
+            "program": "test_emi.py",
+            "console": "integratedTerminal",
+            //"sudo": true,
+        },
+        {
+            "name": "Python: Unit Test Upload",
+            "type": "python",
+            "request": "launch",
+            "program": "test_upload.py",
+            "console": "integratedTerminal",
+            //"sudo": true,
+        }
+        ,
+        {
+            "name": "Python: Unit Test Download",
+            "type": "python",
+            "request": "launch",
+            "program": "test_download.py",
+            "console": "integratedTerminal",
+            //"sudo": true,
+        }
+    ]
+}

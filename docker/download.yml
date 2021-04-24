@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  emi:
+    image: xbot_d
+    tty: true
+    restart: unless-stopped
+    shm_size: 32gb
+    volumes:
+      - ./volume/files:/files
+      - ../xbot:/xbot
+    environment: 
+      - MONGO_CONN=mongodb://root:80190221@mongodb:27017/
+      - S3_URL=s3://xmachine0/xbot
+      - WORKERID=1 
+      - COUNTRY=tr 
+
+networks:
+  default:
+      name: xbot_network
+    

@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+  mongodb:
+    image: ahmetcancomtr1/mongo-b
+    environment:
+      - MONGO_USER=root
+      - MONGO_PASSWORD=80190221
+      - AWS_ACCESS_KEY_ID=AKIA3CORLRRTVZVYBN47
+      - AWS_SECRET_ACCESS_KEY=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
+      - S3_URL=s3://xbot/database_dev
+      - S3B_INTERVAL=21600 #6saat 
+      #- S3B_RESTORE=1 #restore at startup 
+    restart: always
+    ports:
+      - 25000:27017
+    volumes:
+      - ./volume/database:/data/db
+      - ./volume/backup:/backup
+    
+networks:
+  default:
+      name: xbot_network
+    

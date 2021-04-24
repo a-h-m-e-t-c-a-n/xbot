@@ -1,0 +1,5 @@
+#!/bin/bash
+
+adb push local.prop /data/local.prop
+adb shell chmod o-wx /data/local.prop
+adb shell chmod g-wx /data/local.prop

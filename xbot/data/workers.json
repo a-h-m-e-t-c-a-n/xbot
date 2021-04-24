@@ -1,0 +1,23 @@
+{
+    "_id": 1,
+    "last_seen": {
+        "$date": "2021-03-30T01:27:31.178Z"
+    },
+    "downloadtask": {
+        "id": 1,
+        "active": false,
+        "account": {
+            "id": "girlinthefire0",
+            "password": "uyelik"
+        },
+        "profile_list_id":1,
+        "profile_process_interval":600
+    },
+    "uploadtask": {
+        "id": 1,
+        "active": false,
+        "account_list_id":1,
+        "profile_process_interval":60
+
+    }
+}

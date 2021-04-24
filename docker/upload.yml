@@ -1,0 +1,26 @@
+version: '3.7'
+services:
+  emi:
+    image: xbot_u
+    privileged: true
+    tty: true
+    restart: unless-stopped
+    shm_size: 32gb
+    ports:
+      - 25901:5901 
+      - 26901:6901
+    volumes:
+      - ../xbot:/xbot
+    environment:
+      - MONGO_CONN=mongodb://root:80190221@mongodb:27017/
+      - AWS_ACCESS_KEY_ID=AKIA3CORLRRTVZVYBN47
+      - AWS_SECRET_ACCESS_KEY=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
+      - S3_URL=s3://xmachine0/xbot
+      - WORKERID=2 
+      - COUNTRY=tr 
+      - VNC_PW=emi
+
+networks:
+  default:
+      name: xbot_network
+    
