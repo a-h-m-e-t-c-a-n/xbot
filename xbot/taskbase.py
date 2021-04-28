@@ -25,12 +25,15 @@ class TaskBase:
         print(f"{tag}: {subject}")
     
     def get_media_path(self,ownerid,mediaid):
-        return os.path.join("media",ownerid,mediaid) 
+        return os.path.join("media","cached",ownerid,mediaid) 
 
     def copy_file_to_local(self,remotepath,localpath):
         s3_remotepath=os.path.join(self.s3_url,remotepath)
-        if os.system(f"aws s3 cp {s3_remotepath} {localpath}") !=0:
-            raise Exception("copy_file_to_local s3 media download error")
+        if os.path.exists(localpath)==False:
+            if os.system(f"aws s3 cp {s3_remotepath} {localpath}") !=0:
+                raise Exception("copy_file_to_local s3 media download error")
+        else:
+            self.log(f"aws s3 cp !!! {localpath} exists,skipping...")
         return localpath
 
     def copy_media_to_local(self,ownerid,mediaid):
@@ -47,7 +50,7 @@ class TaskBase:
         return localpath
 
     def purge_mediadir(self):
-         os.system(f"rm -r media/*")
+         os.system(f"rm -r media/cached/*")
     
     def calc_elevation(self,postdate,comments,likes):
         total_hour=((datetime.utcnow()-postdate).total_seconds()/3600)

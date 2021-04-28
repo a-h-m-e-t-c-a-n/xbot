@@ -221,32 +221,65 @@ class DownloadTask(TaskBase):
 
         self.db.posts.update_one({"_id":post.shortcode},{"$set":post_data},upsert=True)
         return result
+    
+    async def accept_post_update(self,post):
+        self.log("accept_post_update executing ........")
+        now=datetime.utcnow()
+        post_data={"comments":post.comments,
+                   "likes":post.likes,
+                   "comments":post.comments,
+                   "elevation":self.calc_elevation(post.date_utc,post.comments,post.likes)
 
+        }
+        self.db.posts.update_one({"_id":post.shortcode},{"$set":post_data},upsert=True)
     async def process_profile(self,profileinfo):
         profile=instaloader.Profile.from_username(self.L.context,profileinfo["_id"])
         await self.update_profile(profile)
         self.log("instgaloader profile fetched")
-        count_limit=profileinfo.get("count_limit",self.taskinfo.get("d_count_limit",0))
         past_max=profileinfo.get("past_max",self.taskinfo.get("d_past_max",0))
 
-        total_count=0
         for post in profile.get_posts():
-            self.log(f"process_profile {profileinfo.get('_id')} post >  {post.shortcode} comments:{post.comments} likes:{post.likes} video:{post.is_video} {post.date_utc} ddays:{(datetime.utcnow()-post.date_utc).days} {post.caption}")
-            if past_max>0:
-                dday=((datetime.utcnow()-post.date_utc).total_seconds()/86400)
-                if dday>past_max:
-                    self.log(f"process_profile {profileinfo.get('_id')} past_max matched {dday}>{past_max}")
-                    break
-            if count_limit>0:
-                if total_count>count_limit:
-                    self.log(f"process_profile {profileinfo.get('_id')} count_limit matched {total_count}>{count_limit}")
-                    break
-            if(self.filter_post(post,profileinfo)):
-                if await self.accept_post(post):
-                   total_count+=0
-                   await self.wait_next(3,30)
-            else:
-                self.log("filter passed")
+            try:
+                self.log(f"process_profile {profileinfo.get('_id')} post >  {post.shortcode} comments:{post.comments} likes:{post.likes} video:{post.is_video} {post.date_utc} ddays:{(datetime.utcnow()-post.date_utc).days} {post.caption}")
+                if past_max>0:
+                    dday=((datetime.utcnow()-post.date_utc).total_seconds()/86400)
+                    if dday>past_max:
+                        self.log(f"process_profile {profileinfo.get('_id')} past_max matched {dday}>{past_max}")
+                        break
+                if(self.filter_post(post,profileinfo)):
+                    if await self.accept_post(post):
+                        await self.wait_next(3,30)
+                else:
+                    self.log("filter passed")
+            except:
+                self.log(f"process_profile loop error blocked {sys.exc_info()[1]} {sys.exc_info()[2].tb_lineno}")
+
+    async def post_exists(self,profileid):
+        return (self.db.posts.find_one({"_id":profileid})!=None)
+
+    async def clone_profile(self,profileinfo):
+        profile=instaloader.Profile.from_username(self.L.context,profileinfo["_id"])
+        await self.update_profile(profile)
+        self.log(f"{profileinfo.get('_id')} cloning ....")
+        clone_past_max=profileinfo.get("clone_past_max",self.taskinfo.get("d_clone_past_max",0))
+
+        for post in profile.get_posts():
+            try:
+                if clone_past_max>0:
+                    dday=((datetime.utcnow()-post.date_utc).total_seconds()/86400)
+                    if dday>clone_past_max:
+                        self.log(f"process_profile {profileinfo.get('_id')} clone_past_max matched {dday}>{clone_past_max}")
+                        break
+                if (await self.post_exists(post.shortcode)):
+                    self.log(f"process_profile {profileinfo.get('_id')} clone post update > comments:{post.comments} likes:{post.likes}")
+                    await asyncio.wait_for(self.accept_post_update(post),30)
+                else:
+                    self.log(f"process_profile {profileinfo.get('_id')} clone post create > comments:{post.comments} likes:{post.likes}")
+                    await asyncio.wait_for(self.accept_post(post),30)
+            except:
+               self.log(f"clone_profile loop error blocked {sys.exc_info()[1]} {sys.exc_info()[2].tb_lineno}")   
+        
+           
     
     async def process_tag(self,hashtaginfo):
         self.log("process_tag executing")
@@ -306,7 +339,12 @@ class DownloadTask(TaskBase):
         profileinfo=await self.fetch_profile()
         try:
             self.log(f"*********************************** {profileinfo['_id']} ********************************************")
-            await self.process_profile(profileinfo)
+            if profileinfo.get("clone",False):
+                await self.clone_profile(profileinfo)
+                if profileinfo.get("clone_autodisable",self.taskinfo.get("d_clone_autodisable",True)):
+                    self.db.download_profiles.update_one({"_id":profileinfo["_id"]},{"$set":{"clone":False}},upsert=True)          
+            else:
+                await self.process_profile(profileinfo)
         except:
             self.log(f"{profileinfo['_id']} error blocked {sys.exc_info()[1]} {sys.exc_info()[2].tb_lineno}")
         

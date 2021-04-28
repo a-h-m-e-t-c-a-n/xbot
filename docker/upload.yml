@@ -1,11 +1,11 @@
 version: '3.7'
 services:
-  emi:
-    image: xbot_u
+  xbot_u:
+    image: ahmetcancomtr1/xbot_u
     privileged: true
     tty: true
     restart: unless-stopped
-    shm_size: 32gb
+    #shm_size: 1024m
     ports:
       - 25901:5901 
       - 26901:6901

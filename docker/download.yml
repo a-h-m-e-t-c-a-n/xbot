@@ -1,15 +1,16 @@
 version: '3.7'
 services:
-  emi:
-    image: xbot_d
+  xbot_d:
+    image: ahmetcancomtr1/xbot_d
     tty: true
     restart: unless-stopped
     shm_size: 32gb
     volumes:
-      - ./volume/files:/files
       - ../xbot:/xbot
     environment: 
-      - MONGO_CONN=mongodb://root:80190221@mongodb:27017/
+      - MONGO_CONN=mongodb://root:80190221@mongo.xmachine.uk:25000/
+      - AWS_ACCESS_KEY_ID=AKIA3CORLRRTVZVYBN47
+      - AWS_SECRET_ACCESS_KEY=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
       - S3_URL=s3://xmachine0/xbot
       - WORKERID=1 
       - COUNTRY=tr 

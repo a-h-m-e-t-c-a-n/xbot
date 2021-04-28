@@ -21,23 +21,26 @@ RUN update-java-alternatives --set java-1.8.0-openjdk-amd64
 # you can find this file at https://developer.android.com/studio/index.html#downloads - section command line only
 RUN  wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
 
-ENV ANDROID_HOME=/opt/androidsdk
-RUN mkdir -p $ANDROID_HOME
-RUN apt install unzip -y && unzip sdk-tools-linux-4333796.zip -d $ANDROID_HOME
+ENV ANDROID_SDK_ROOT=/opt/androidsdk
+ENV ANDROID_EMULATOR_HOME=$ANDROID_SDK_ROOT/.android
+ENV ANDROID_AVD_HOME=$ANDROID_EMULATOR_HOME/avd
 
-RUN echo "export ANDROID_HOME=$ANDROID_HOME" >> ~/.bashrc
-RUN echo 'export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$SDK/tools/bin:$ANDROID_HOME/platform-tools:$PATH' >> ~/.bashrc
+RUN mkdir -p $ANDROID_AVD_HOME
 
-ENV PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
+RUN apt install unzip -y && unzip sdk-tools-linux-4333796.zip -d $ANDROID_SDK_ROOT
 
-# source ~/.bashrc
+RUN echo "export ANDROID_HOME=$ANDROID_SDK_ROOT" >> ~/.bashrc
+RUN echo "export ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> ~/.bashrc
+RUN echo "export ANDROID_EMULATOR_HOME=$ANDROID_EMULATOR_HOME" >> ~/.bashrc
+RUN echo "export ANDROID_AVD_HOME=$ANDROID_AVD_HOME" >> ~/.bashrc
+RUN echo "export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH" >> ~/.bashrc
 
-# Install Android Image version 30
-RUN yes | $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms;android-29" "emulator"
-RUN yes | $ANDROID_HOME/tools/bin/sdkmanager "system-images;android-29;default;x86_64"
+# Install Android Image version 29
+RUN yes | $ANDROID_SDK_ROOT/tools/bin/sdkmanager "platform-tools" "platforms;android-29" "emulator"
+RUN yes | $ANDROID_SDK_ROOT/tools/bin/sdkmanager "system-images;android-29;default;x86_64"
 
-RUN rm -r $ANDROID_HOME/system-images/android-29/default/x86_64
-ADD customimg/x86_64 $ANDROID_HOME/system-images/android-29/default/x86_64
+RUN rm -r $ANDROID_SDK_ROOT/system-images/android-29/default/x86_64
+ADD customimg/x86_64 $ANDROID_SDK_ROOT/system-images/android-29/default/x86_64
 
 RUN  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 RUN unzip awscliv2.zip
