@@ -1,2 +1,2 @@
 instagram bot 
-pyhton docker mongodb
+pyhton docker mongodb android sdk emulator
